@@ -14,7 +14,7 @@ helpers do
   end
 
   def parse_json
-    Dir.glob('.json', base: 'data').map do |file_name|
+    Dir.glob('*.json', base: 'data').map do |file_name|
       File.open("data/#{file_name}") do |file|
         JSON.parse(file.read, symbolize_names: true)
       end
@@ -22,9 +22,7 @@ helpers do
   end
 
   def sort_files(files)
-    files.sort do |a, b|
-      [b[:time]] <=> [a[:time]]
-    end
+    files.sort_by { |file| file[:time] }.reverse
   end
 end
 
