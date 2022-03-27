@@ -14,7 +14,7 @@ helpers do
   end
 
   def parse_json
-    Dir.glob('*', base: 'data').map do |file_name|
+    Dir.glob('.json', base: 'data').map do |file_name|
       File.open("data/#{file_name}") do |file|
         JSON.parse(file.read, symbolize_names: true)
       end
