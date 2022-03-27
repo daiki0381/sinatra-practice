@@ -136,7 +136,6 @@ button {
 
 .btn {
   display: inline-block;
-  border: none;
   color: white;
   font-size: 16px;
   font-weight: bold;
@@ -145,6 +144,8 @@ button {
   border-radius: 4px;
   background: linear-gradient(45deg, #709dff 0%, #b0c9ff 100%);
   margin-bottom: 30px;
+  text-decoration: none;
+  padding-top: 12px
 }
 
 button:hover, .btn:hover {
