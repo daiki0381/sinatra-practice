@@ -21,6 +21,10 @@ helpers do
     end
   end
 
+  def return_specific_file(id)
+    JSON.parse(File.open("data/#{id}.json").read, symbolize_names: true)
+  end
+
   def sort_files(files)
     files.sort_by { |file| file[:time] }.reverse
   end
@@ -44,30 +48,45 @@ post '/memos' do
 end
 
 get '/memos/:id' do |id|
-  json_file = JSON.parse(File.open("data/#{id}.json").read, symbolize_names: true)
-  @title = json_file[:title]
-  @content = json_file[:content]
-  erb :details
+  if File.exist?("data/#{id}.json")
+    @memo = return_specific_file(id)
+    erb :details
+  else
+    erb :not_found
+  end
 end
 
 delete '/memos/:id' do |id|
-  File.delete("data/#{id}.json")
-  redirect to('/memos')
+  if File.exist?("data/#{id}.json")
+    File.delete("data/#{id}.json")
+    redirect to('/memos')
+  else
+    erb :not_found
+  end
 end
 
 get '/memos/:id/edit' do |id|
-  json_file = JSON.parse(File.open("data/#{id}.json").read, symbolize_names: true)
-  @title = json_file[:title]
-  @content = json_file[:content]
-  erb :edit
+  if File.exist?("data/#{id}.json")
+    @memo = return_specific_file(id)
+    erb :edit
+  else
+    erb :not_found
+  end
 end
 
 patch '/memos/:id' do |id|
-  json_file = JSON.parse(File.open("data/#{id}.json").read, symbolize_names: true)
-  time = json_file[:time]
-  hash = { id: id, time: time, title: params[:title], content: params[:content] }
-  File.open("data/#{id}.json", 'w') do |file|
-    JSON.dump(hash, file)
+  if File.exist?("data/#{id}.json")
+    time = return_specific_file(id)[:time]
+    hash = { id: id, time: time, title: params[:title], content: params[:content] }
+    File.open("data/#{id}.json", 'w') do |file|
+      JSON.dump(hash, file)
+    end
+    redirect to("memos/#{id}")
+  else
+    erb :not_found
   end
-  redirect to("memos/#{id}")
+end
+
+not_found do
+  erb :not_found
 end

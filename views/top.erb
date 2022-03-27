@@ -1,7 +1,7 @@
 <h1>メモ一覧画面</h1>
-<% @memos.each do |memo| %>
-  <li><a href="/memos/<%= memo[:id] %>"><%= sanitize(memo[:title]) %></a></li>
-<% end %>
-<form action="/new" method="get">
-  <button type="submit">追加</button>
-</form>
+<ul>
+  <% @memos.each do |memo| %>
+    <li><a href="/memos/<%= memo[:id] %>"><%= sanitize(memo[:title]) %></a></li>
+  <% end %>
+</ul>
+<a href="/new" class="btn">追加</a>
