@@ -51,44 +51,24 @@ post '/memos' do
 end
 
 get '/memos/:id' do |id|
-  if File.exist?("data/#{id}.json")
-    @memo = read_memo(id)
-    erb :details
-  else
-    erb :not_found
-  end
+  @memo = read_memo(id)
+  erb :details
 end
 
 delete '/memos/:id' do |id|
-  if File.exist?("data/#{id}.json")
-    delete_memo(id)
-    redirect to('/memos')
-  else
-    erb :not_found
-  end
+  delete_memo(id)
+  redirect to('/memos')
 end
 
 get '/memos/:id/edit' do |id|
-  if File.exist?("data/#{id}.json")
-    @memo = read_memo(id)
-    erb :edit
-  else
-    erb :not_found
-  end
+  @memo = read_memo(id)
+  erb :edit
 end
 
 patch '/memos/:id' do |id|
-  if File.exist?("data/#{id}.json")
-    memo = read_memo(id)
-    memo[:title] = params[:title]
-    memo[:content] = params[:content]
-    save_memo(id, memo)
-    redirect to("memos/#{id}")
-  else
-    erb :not_found
-  end
-end
-
-not_found do
-  erb :not_found
+  memo = read_memo(id)
+  memo[:title] = params[:title]
+  memo[:content] = params[:content]
+  save_memo(id, memo)
+  redirect to("memos/#{id}")
 end
