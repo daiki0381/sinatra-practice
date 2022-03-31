@@ -19,7 +19,7 @@ helpers do
   end
 
   def read_memo(connection, id)
-    connection.exec('SELECT * FROM memo WHERE id = $1', [id])
+    connection.exec('SELECT * FROM memo WHERE id = $1', [id]).first
   end
 end
 
