@@ -17,6 +17,10 @@ helpers do
   def sanitize(text)
     escape_html(text)
   end
+
+  def read_memo(connection, id)
+    connection.exec('SELECT * FROM memo WHERE id = $1', [id])
+  end
 end
 
 get '/memos' do
@@ -36,7 +40,7 @@ post '/memos' do
 end
 
 get '/memos/:id' do |id|
-  @memos = connection.exec('SELECT * FROM memo WHERE id = $1', [id])
+  @memo = read_memo(connection, id)
   erb :details
 end
 
@@ -46,7 +50,7 @@ delete '/memos/:id' do |id|
 end
 
 get '/memos/:id/edit' do |id|
-  @memos = connection.exec('SELECT * FROM memo WHERE id = $1', [id])
+  @memo = read_memo(connection, id)
   erb :edit
 end
 

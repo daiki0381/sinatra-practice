@@ -134,6 +134,20 @@ button {
   margin-bottom: 30px;
 }
 
-button:hover {
+.btn {
+  display: inline-block;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  width: 160px;
+  height: 40px;
+  border-radius: 4px;
+  background: linear-gradient(45deg, #709dff 0%, #b0c9ff 100%);
+  margin-bottom: 30px;
+  text-decoration: none;
+  padding-top: 12px
+}
+
+button:hover, .btn:hover {
   background: linear-gradient(45deg, #709dff 50%, #b0c9ff 100%);
 }
