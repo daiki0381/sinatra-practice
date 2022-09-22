@@ -3,8 +3,13 @@
 # !/usr/bin/env ruby
 require 'sinatra'
 require 'sinatra/reloader'
-require 'erb'
-require 'json'
+require 'pg'
+
+connection = PG::Connection.new(dbname: 'sinatra')
+connection.exec('CREATE TABLE IF NOT EXISTS memo (
+  id serial primary key,
+  title varchar(20),
+  content varchar(200))')
 
 helpers do
   include ERB::Util
@@ -13,30 +18,13 @@ helpers do
     escape_html(text)
   end
 
-  def read_memos
-    memos = Dir.glob('*.json', base: 'data').map do |file_name|
-      read_memo(file_name.delete('.json'))
-    end
-    memos.sort_by { |memo| memo[:time] }.reverse
-  end
-
-  def read_memo(id)
-    JSON.parse(File.open("data/#{id}.json").read, symbolize_names: true)
-  end
-
-  def save_memo(id, memo)
-    File.open("data/#{id}.json", 'w') do |file|
-      JSON.dump(memo, file)
-    end
-  end
-
-  def delete_memo(id)
-    File.delete("data/#{id}.json")
+  def read_memo(connection, id)
+    connection.exec('SELECT * FROM memo WHERE id = $1', [id]).first
   end
 end
 
 get '/memos' do
-  @memos = read_memos
+  @memos = connection.exec('SELECT * FROM memo ORDER BY id DESC')
   erb :top
 end
 
@@ -45,30 +33,30 @@ get '/new' do
 end
 
 post '/memos' do
-  memo = { id: SecureRandom.uuid, time: Time.now, title: params[:title], content: params[:content] }
-  save_memo(memo[:id], memo)
+  title = params[:title]
+  content = params[:content]
+  connection.exec('INSERT INTO memo (title, content) VALUES ($1, $2)', [title, content])
   redirect to('/memos')
 end
 
 get '/memos/:id' do |id|
-  @memo = read_memo(id)
+  @memo = read_memo(connection, id)
   erb :details
 end
 
 delete '/memos/:id' do |id|
-  delete_memo(id)
+  connection.exec('DELETE FROM memo WHERE id = $1', [id])
   redirect to('/memos')
 end
 
 get '/memos/:id/edit' do |id|
-  @memo = read_memo(id)
+  @memo = read_memo(connection, id)
   erb :edit
 end
 
 patch '/memos/:id' do |id|
-  memo = read_memo(id)
-  memo[:title] = params[:title]
-  memo[:content] = params[:content]
-  save_memo(id, memo)
+  title = params[:title]
+  content = params[:content]
+  connection.exec('UPDATE memo SET title = $1, content = $2 WHERE id = $3', [title, content, id])
   redirect to("memos/#{id}")
 end
